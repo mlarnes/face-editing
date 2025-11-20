@@ -75,6 +75,7 @@ pip install ninja
 ### Face Editing
 
 ```python
+import torch
 from models.face_model import FaceModel
 from utils.common import *
 from utils.data_utils import *
@@ -92,13 +93,14 @@ image = Image.open("path/to/face.jpg")
 # Define edits
 edits = edit_attributes.copy()
 edits["age"]["factor"] = 2.5  # Make older
-edits["smile"]["delta"] = 5.0  # Increase smile
+edits["mouth_smiling"]["delta"] = 5.0  # Increase smile
 edits["hair"]["delta"] = 10.0  # Modify hair
 
 # Run editing
 data = run_prediction(face_model, [image], return_weights_deltas=True)
 latent = data["latent"][0]
 weights_deltas = data["weights_deltas"][0]
+style = None
 
 # Apply edits
 for name, config in edits.items():
@@ -120,6 +122,8 @@ result = tensor2im(edited[0])
 from models.face_model import FaceModel
 from utils.morphing_utils import interpolation
 from utils.data_utils import create_video
+from utils.inference_utils import run_prediction
+from utils.common import tensor2im
 from PIL import Image
 
 # Initialize model
@@ -156,7 +160,6 @@ The framework supports editing of the following attributes:
 ### Latent Space Edits (InterfaceGAN)
 - **Age** - Control age appearance
 - **Pose** - Adjust head pose and orientation
-- **Smile** - Modify smile intensity
 
 ### Style Space Edits (StyleSpace)
 - **Hair** - Change hair style and appearance

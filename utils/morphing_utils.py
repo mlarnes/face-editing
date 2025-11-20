@@ -1,10 +1,15 @@
 import dlib
 import numpy as np
 import cv2
+import torch
 from PIL import Image
 
 
 def interpolate_latents(latent_A, latent_B, ratio):
+    # Ensure both latents are on the same device
+    if isinstance(latent_A, torch.Tensor) and isinstance(latent_B, torch.Tensor):
+        device = latent_A.device
+        latent_B = latent_B.to(device)
     return latent_A + ratio * (latent_B - latent_A)
 
 
@@ -13,6 +18,10 @@ def interpolate_styles(style_A, style_B, ratio):
         return
     style = []
     for s_A, s_B in zip(style_A, style_B):
+        # Ensure both styles are on the same device
+        if isinstance(s_A, torch.Tensor) and isinstance(s_B, torch.Tensor):
+            device = s_A.device
+            s_B = s_B.to(device)
         style.append(s_A + ratio * (s_B - s_A))
     return style
     
@@ -22,7 +31,11 @@ def interpolate_weights_deltas(weights_deltas_A, weights_deltas_B, ratio):
     for dw_A, dw_B in zip(weights_deltas_A, weights_deltas_B):
         if dw_A is None or dw_B is None:
             weights_deltas.append(None)
-        else:    
+        else:
+            # Ensure both deltas are on the same device
+            if isinstance(dw_A, torch.Tensor) and isinstance(dw_B, torch.Tensor):
+                device = dw_A.device
+                dw_B = dw_B.to(device)
             weights_deltas.append(dw_A + ratio * (dw_B - dw_A))
     return weights_deltas
 
@@ -33,6 +46,11 @@ def interpolation(p_A, p_B, n_frames):
 
     latent_A, weights_deltas_A = p_A["latent"], p_A["weights_deltas"]
     latent_B, weights_deltas_B = p_B["latent"], p_B["weights_deltas"]
+    
+    # Ensure both latents are on the same device
+    if isinstance(latent_A, torch.Tensor) and isinstance(latent_B, torch.Tensor):
+        device = latent_A.device
+        latent_B = latent_B.to(device)
     
     for ratio in ratios:
         latent = interpolate_latents(latent_A, latent_B, ratio)

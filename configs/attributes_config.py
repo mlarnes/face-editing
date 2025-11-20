@@ -43,10 +43,10 @@ edit_attributes = {
     # https://github.com/genforce/interfacegan
     "pose": {
         "level": "latent",
-        "direction": torch.load(edit_paths['pose']).cuda()
+        "direction": torch.load(edit_paths['pose'], map_location='cpu')
     },
     "age": {
         "level": "latent",
-        "direction": torch.load(edit_paths['age']).cuda()
+        "direction": torch.load(edit_paths['age'], map_location='cpu')
     },
 }
